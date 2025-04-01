@@ -1,7 +1,9 @@
 https://google.com
 https://httpbin.org/status/404
+https://httpbin.org/status/412
 https://httpbin.org/status/200
 https://httpbin.org/status/200
 https://httpbin.org/status/200
 https://httpbin.org/status/503
 https://httpbin.org/status/200
+https://httpbin.org/status/501

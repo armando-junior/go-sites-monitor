@@ -6,6 +6,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -58,6 +59,7 @@ func selectOption(option int) {
 		monitor()
 	case 2:
 		fmt.Println("Logs displayed")
+		readLog()
 	case 0:
 		fmt.Println("Exiting program")
 		os.Exit(0)
@@ -93,10 +95,11 @@ func validateStatus(sites []string) {
 			fmt.Println("Error reading file:", err)
 		}
 
-		if response.StatusCode == 200 {
+		if response.StatusCode >= 200 && response.StatusCode < 300 {
 			fmt.Println("Site:", site, "was loaded successfully")
 		} else {
 			fmt.Println("Site:", site, "is not running")
+			writeLog(site, response.StatusCode)
 		}
 	}
 }
@@ -124,4 +127,43 @@ func readFromFile() []string {
 
 	file.Close()
 	return sites
+}
+
+func writeLog(site string, status int) {
+	// os.O_CREATE: create the file if it doesn't exist
+	// os.O_RDWR: open the file for reading and writing
+	// os.O_APPEND: append to the file
+	file, err := os.OpenFile("log.txt", os.O_CREATE|os.O_RDWR|os.O_APPEND, 0666)
+	if err != nil {
+		fmt.Println("Error writing file:", err)
+	}
+
+	writer := bufio.NewWriter(file)
+	writer.WriteString(time.Now().Format("02/01/2006 15:04:05") + " - " + site + " - " +
+		strconv.Itoa(status) + "\n")
+	writer.Flush()
+
+	file.Close()
+}
+
+func readLog() {
+	file, err := os.Open("log.txt")
+	if err != nil {
+		fmt.Println("Error reading file:", err)
+	}
+
+	reader := bufio.NewReader(file)
+	for {
+		line, err := reader.ReadString('\n')
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			fmt.Println("Error reading file:", err)
+			return
+		}
+		fmt.Println(strings.TrimSpace(line))
+	}
+
+	file.Close()
 }
