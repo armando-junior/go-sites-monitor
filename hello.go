@@ -162,7 +162,7 @@ func readLog() {
 			fmt.Println("Error reading file:", err)
 			return
 		}
-		fmt.Println(strings.TrimSpace(line))
+		fmt.Println(strings.TrimSpace(line)"")
 	}
 
 	file.Close()
